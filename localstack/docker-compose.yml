@@ -1,0 +1,13 @@
+version: '2.1'
+
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4576:4576"
+      - "4568:4568"
+      - "4569:4569"
+    environment:
+      - SERVICES=sqs,kinesis,dynamodb
+    volumes:
+      - ./setup:/docker-entrypoint-initaws.d
