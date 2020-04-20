@@ -13,10 +13,14 @@ import com.sse.demo.services.FluxNotificationProcessor;
 import com.sse.demo.models.Notification;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RecordProcessor implements IRecordProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(RecordProcessor.class);
 
     private final KinesisConsumer kinesisConsumer;
     private final FluxNotificationProcessor notificationProcessor;
@@ -31,17 +35,12 @@ public class RecordProcessor implements IRecordProcessor {
 
     @Override
     public void initialize(InitializationInput initializationInput) {
-        System.out.println("Initializing record processor");
+        logger.info("Initializing record processor");
     }
 
     @Override
     public void processRecords(ProcessRecordsInput processRecordsInput) {
-        System.out.println(
-            String.format(
-                "Processing %d records from Kinesis",
-                processRecordsInput.getRecords().size()
-            )
-        );
+        logger.info("Processing {} records from Kinesis", processRecordsInput.getRecords().size());
 
         processRecordsInput.getRecords().forEach(record -> {
             String message = StandardCharsets.UTF_8.decode(record.getData()).toString();
@@ -58,7 +57,7 @@ public class RecordProcessor implements IRecordProcessor {
             checkpoint(shutdownInput.getCheckpointer());
         }
 
-        System.out.println("Shutting down record processor");
+        logger.info("Shutting down record processor");
     }
 
     private void checkpoint(IRecordProcessorCheckpointer checkpointer) {

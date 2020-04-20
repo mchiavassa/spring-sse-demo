@@ -10,12 +10,16 @@ import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibC
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.Worker;
 import com.amazonaws.services.kinesis.metrics.interfaces.MetricsLevel;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
 @Component
 public class KinesisListenerStarter implements SmartLifecycle {
+
+    private static final Logger logger = LoggerFactory.getLogger(KinesisListenerStarter.class);
 
     private static final String APPLICATION_NAME = "sse-demo";
 
@@ -44,7 +48,7 @@ public class KinesisListenerStarter implements SmartLifecycle {
 
     @Override
     public void start() {
-        System.out.println("Starting Kinesis Worker");
+        logger.info("Starting Kinesis Worker");
 
         KinesisClientLibConfiguration config = new KinesisClientLibConfiguration(
             APPLICATION_NAME,
@@ -69,13 +73,13 @@ public class KinesisListenerStarter implements SmartLifecycle {
                 .build())
             .build();
 
-        workerThread = new Thread(worker, "kinesisListener");
+        workerThread = new Thread(worker, "kinesis-worker-thread");
         workerThread.start();
     }
 
     @Override
     public void stop() {
-        System.out.println("Stopping Kinesis Worker");
+        logger.info("Stopping Kinesis Worker");
 
         try {
             worker.createGracefulShutdownCallable().call();
